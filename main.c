@@ -59,6 +59,26 @@ char	*init_buffer(int size)
 	return (buffer);
 }
 
+void	display_buffer(t_window window)
+{
+	int	i;
+	int	x;
+	int	y;
+
+	x = 0;
+	while (i < window.buffer.size)
+	{
+		if (x >= window.width)
+		{
+			x = 0;
+			printf("\n");
+		}
+		printf("%c", window.buffer.string[i]);
+		i++;
+		x++;
+	}
+}
+
 void init_window(t_window *window, int width, int height)
 {
 	int	size;
@@ -125,10 +145,11 @@ int	main(int ac, char **av)
 		init_window(&window, 64, 32);
 		if (window.buffer.string)
 		{
-			t_position	pos1 = create_position(2, 0);
-			t_position	pos2 = create_position(24, 6);
+			t_position	pos1 = create_position(24, 50);
+			t_position	pos2 = create_position(22, 10);
 			draw_line(pos1, pos2, window);
-			printf("%s\n", window.buffer.string);
+			//printf("%s\n", window.buffer.string);
+			display_buffer(window);
 			free(window.buffer.string);
 		}
 	}
