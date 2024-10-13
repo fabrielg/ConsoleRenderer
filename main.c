@@ -28,6 +28,11 @@ int	position_to_index(t_position pos, int width)
 	return (pos.y * (width + 1) + pos.x);
 }
 
+void	display_position(t_position pos_to_print)
+{
+	printf("x = %d; y = %d\n", pos_to_print.x, pos_to_print.y);
+}
+
 void	write_in_buffer(char c, char *buffer, int size, int position)
 {
 	if (position < size)
@@ -40,7 +45,7 @@ void	clear_buffer(char *buffer, int size)
 
 	i = -1;
 	while (++i < size)
-		buffer[i] = '\0';
+		buffer[i] = ' ';
 }
 
 char	*init_buffer(int size)
@@ -73,36 +78,40 @@ void	draw_line(t_position pos1, t_position pos2, t_window window)
 {
 	int	dx;
 	int	dy;
-	int	m;
-	int	y;
+	int	p;
+	int	dist_no_step;
+	int	dist_step;
 
-	dx = pos2.x - pos1.x;
-	dy = pos2.y - pos1.y;
-	m = dy / dx;	// dx can't be 0
-	/*printf(
-		"Pos 1 : x = %d	y = %d \n\
-		Pos 2 : x = %d	y = %d \n\n\
-		dx = x2 - x1 = %d - %d = %d \n\
-		dy = y2 - y1 = %d - %d = %d \n\
-		m = dy / dx = %d / %d = %d \n\n",
-		pos1.x,
-		pos1.y,
-		pos2.x,
-		pos2.y,
-		pos2.x,
-		pos1.x,
-		dx,
-		pos2.y,
-		pos1.y,
-		dy,
-		dy,
-		dx,
-		m
-	);*/
-	for (int x = pos1.x; x < pos2.x; x++)
+	dx = abs(pos2.x - pos1.x);
+	dy = abs(pos2.y - pos1.y);
+	p = 2 * dy - dx;
+	dist_no_step = 2 * dy;
+	dist_step = 2 * (dy - dx);
+
+	int	x, y, x_end;
+	if (pos1.x > pos2.x)
 	{
-		y = m * (x - pos1.x) + pos1.y;
-		/*printf("x = %d; y = %d\n", x, y);*/
+		x = pos2.x;
+		y = pos2.y;
+		x_end = pos1.x;
+	}
+	else
+	{
+		x = pos1.x;
+		y = pos1.y;
+		x_end = pos2.x;
+	}
+
+	while (x < x_end)
+	{
+		x++;
+		if (p < 0)
+			p += dist_no_step;
+		else
+		{
+			y++;
+			p += dist_step;
+		}
 		write_in_buffer('#', window.buffer.string, window.buffer.size, position_to_index(create_position(x, y), window.width));
 	}
 }
@@ -116,8 +125,8 @@ int	main(int ac, char **av)
 		init_window(&window, 64, 32);
 		if (window.buffer.string)
 		{
-			t_position	pos1 = create_position(2, 6);
-			t_position	pos2 = create_position(5, 19);
+			t_position	pos1 = create_position(2, 0);
+			t_position	pos2 = create_position(24, 6);
 			draw_line(pos1, pos2, window);
 			printf("%s\n", window.buffer.string);
 			free(window.buffer.string);
